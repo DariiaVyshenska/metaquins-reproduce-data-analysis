@@ -147,6 +147,22 @@ input_table <- reorder_df(read_ratio_df)
 plot_stackbar(plot_df = input_table, file_name = "readsbylength_ratio.pdf")
 
 
+# RUVg NORMALIZATION OF READS
+# using untransformed data!
+require("RUVSeq")
+raw_files_path <- "./read_stat_files/"
+parsed <- parse_bbmap_read(raw_files_path, sp_meta)
+set <- as.matrix(rbind(parsed$mags,parsed$spequins))
+is.numeric(set)
+spikes <- rownames(set) %in% same_sequins
 
+setRUVg <- RUVg(set, spikes, k=1)
+write.csv(setRUVg$normalizedCounts, "normalized_tables/reads_RUVg.csv")
+
+# plotting normalized data
+bac_logic <- rownames(setRUVg$normalizedCounts) %in% rownames(parsed$mags)
+ruvg_bac <- as.data.frame(setRUVg$normalizedCounts[bac_logic,])
+input_table <- reorder_df(ruvg_bac)
+plot_stackbar(plot_df = input_table, file_name = "ruvg_read_bact.pdf")
 
 
